@@ -1,7 +1,7 @@
 <?php get_header(); ?>
 
-<div class="container">
-    <h1><?php bloginfo('name'); ?></h1>
+<div class="container" id="container-index">
+
     <p><?php bloginfo('description'); ?></p>
 
     <?php if (have_posts()) : while (have_posts()) : the_post(); ?>

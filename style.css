@@ -7,13 +7,18 @@ License: World Pirates Association
 Text Domain: choose-me-theme
 */
 
-body{
+html{
+  margin-top: 0;
+  top: 0;
+}
+
+body, html{
 
   margin: 0;
-  padding-left: 10vw;
-  padding-right: 10vw;
+
   text-align: justify;
-  padding-top: 2vh;
+  padding-top: 0vh;
+
   padding-bottom: 2vh;
 
   /*for the texts*/
@@ -37,4 +42,32 @@ gap: 1vw;
   marker: none;
   list-style-type: none;
   padding: 0;
+}
+
+header{
+  padding: 1vw 1vh;
+  background-color: #b2b2b2;
+  color: black;
+  padding-left: 10vw;
+  padding-right: 10vw;
+  display: flex;
+  flex-direction: row;
+
+}
+
+.main-navigation{
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center
+}
+
+header h1, header h2,header h3,header h4,header h5, header h6, header p,header article{
+  background-color: #b2b2b2;
+}
+
+.container{
+  padding-left: 10vw;
+  padding-right: 10vw;
 }
