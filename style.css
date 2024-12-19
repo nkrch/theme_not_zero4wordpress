@@ -1,8 +1,40 @@
-Copy
 /*
-Theme Name: My First WordPress Theme
+Theme name: My Custom Theme
+Author: AlinaP
+Description: First WP theme
+Version: 0.1
+License: World Pirates Association
+Text Domain: choose-me-theme
 */
 
-body {
-background: #21759b;
+body{
+
+  margin: 0;
+  padding-left: 10vw;
+  padding-right: 10vw;
+  text-align: justify;
+  padding-top: 2vh;
+  padding-bottom: 2vh;
+
+  /*for the texts*/
+  background-color: #232323;
+  color: white;
+  font-family: sans-serif;
+  font-weight: 500;
+}
+
+h1,h2,h3,h4,h5,h6,p,article{
+  background-color: #232323;
+  color: white;
+  font-family: sans-serif;
+  font-weight: 500;
+}
+
+.main-navigation ul{
+  display: flex;
+  flex-direction: row;
+gap: 1vw;
+  marker: none;
+  list-style-type: none;
+  padding: 0;
 }
