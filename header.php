@@ -45,6 +45,9 @@ require_once ('cabinet.php');
 // Вход
 require_once 'auth.php';
 } 
+elseif (is_singular('product')) {
+   require_once 'single.php';
+}
 else {
 // Для всех других случаев (404)
 require_once '404.php';

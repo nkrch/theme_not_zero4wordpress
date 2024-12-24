@@ -205,3 +205,21 @@ img {
 #btn-prime-big {
   max-width: 300px;
 }
+
+.product-card-big {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.right {
+  width: 30%;
+  height: auto;
+}
+
+.back {
+  margin-top: 10vh;
+}
