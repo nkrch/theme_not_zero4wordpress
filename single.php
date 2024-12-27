@@ -13,31 +13,32 @@ get_header();
         <?php the_post(); 
         $title = get_the_title();
         $price = get_field('price');
-        $description=get_field('description');
-        $image=get_field('image');
+        $description = get_field('description');
+        $image = get_field('image');
         ?>
-        <?php if ( has_post_thumbnail() ) :
-           ?>
-
+        <?php if ( has_post_thumbnail() ) : ?>
+            <!-- Вы можете отобразить миниатюру поста здесь, если необходимо -->
         <?php endif; ?>
-        
+
         <div class="container">
-            <?php echo '<div class="product-card-big"><div class="left">';
-            echo '<h1>' . esc_html($title) . '</h1>';
-            
-            echo '<p class="description">' . esc_html($description) . '</p>';
-            echo '<p class="price">' . esc_html($price) . ' руб.</p>';
-            echo '<a class="btn-prime" id="btn-prime-big" href="' . esc_url(get_the_permalink()) . '">Купить</a>';
-            echo '<a class="back" href="' . esc_url(get_post_type_archive_link('product')) . '">Назад</a>';
-            echo '</div>
-            <img class="right" src="' . $image . '" alt=""></div></div>';
+            <div class="product-card-big">
+                <div class="left">
+                    <h1><?php echo esc_html($title); ?></h1>
+                    <p class="description"><?php echo esc_html($description); ?></p>
+                    <p class="price"><?php echo esc_html($price); ?> руб.</p>
+                    <a class="btn-prime" id="btn-prime-big" href="<?php echo esc_url(get_the_permalink()); ?>">Купить</a>
+                    <a class="back" href="<?php echo esc_url(get_post_type_archive_link('product')); ?>">Назад</a>
+                </div>
+                <img class="right" src="<?php echo esc_url($image); ?>" alt="<?php echo esc_attr($title); ?>">
+            </div>
+        </div>
 
-
-            
-            ?>       
+        <!-- Интеграция секции комментариев -->
+        <div class="custom-comment-section">
+            <?php custom_integrate_comment_section(get_the_ID()); ?>
         </div>
     <?php endwhile; ?>
-
-    
 </div>
-<?php get_footer(); ?>
+<?php
+get_footer();
+?>

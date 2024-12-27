@@ -223,3 +223,11 @@ img {
 .back {
   margin-top: 10vh;
 }
+
+.custom-comments {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-left: 10vw;
+  padding-right: 10vw;
+}
