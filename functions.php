@@ -4,9 +4,8 @@ function enqueue_theme_styles_and_scripts() {
     // Подключение основного файла стилей
     wp_enqueue_style('theme-style', get_stylesheet_uri());
 
-    // Подключение Bootstrap JS (убедитесь, что используете корректную версию)
     wp_enqueue_script('bootstrap-js', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js', array('jquery'), null, true);
-}
+    wp_enqueue_script('cart-script', get_template_directory_uri() . './cart.js', array('jquery'), null, true);}
 
 add_action('wp_enqueue_scripts', 'enqueue_theme_styles_and_scripts');
 
@@ -69,76 +68,6 @@ function include_product_in_archive( $query ) {
 }
 add_action('pre_get_posts', 'include_product_in_archive');
 
-/**
- * ================================
- * Custom Comment Functions Start
- * ================================
- */
-
-// Обработка отправки формы комментария
-/*function custom_handle_comment_submission($post_id) {
-    // Проверка nonce для безопасности
-    if ( ! isset($_POST['custom_comment_nonce']) || ! wp_verify_nonce($_POST['custom_comment_nonce'], 'custom_comment_action') ) {
-        echo '<p style="color:red;">Security check failed. Please try again.</p>';
-        return;
-    }
-
-    // Санитизация и валидация введенных данных
-    $email = sanitize_email($_POST['email']);
-    $rating = intval($_POST['rating']);
-    $comment_content = sanitize_textarea_field($_POST['comment']);
-
-    $errors = array();
-
-    if ( ! is_email($email) ) {
-        $errors[] = 'Please enter a valid email address.';
-    }
-
-    if ( $rating < 1 || $rating > 5 ) {
-        $errors[] = 'Rating must be between 1 and 5.';
-    }
-
-    if ( empty($comment_content) ) {
-        $errors[] = 'Please enter a comment.';
-    }
-
-    if ( ! empty($errors) ) {
-        foreach ( $errors as $error ) {
-            echo '<p style="color:red;">' . esc_html($error) . '</p>';
-        }
-        return;
-    }
-
-    // Подготовка данных комментария
-    $current_user = wp_get_current_user();
-
-    $commentdata = array(
-        'comment_post_ID'      => $post_id,
-        'comment_author'       => $current_user->exists() ? $current_user->display_name : 'Anonymous',
-        'comment_author_email' => $email,
-        'comment_content'      => $comment_content,
-        'comment_type'         => '', // '' для обычных комментариев
-        'comment_parent'       => 0,
-        'user_id'              => $current_user->ID,
-        'comment_approved'     => 1, // Автоматическое одобрение; установить 0 для ручного одобрения
-    );
-
-    // Вставка комментария в базу данных
-    $comment_id = wp_insert_comment($commentdata);
-
-    if ( $comment_id ) {
-        // Добавление рейтинга как мета данных комментария
-        add_comment_meta($comment_id, 'rating', $rating);
-        echo '<p style="color:green;">Thank you for your comment!</p>';
-    } else {
-        echo '<p style="color:red;">There was an error submitting your comment. Please try again.</p>';
-    }
-}*/
-
-// Отображение формы комментария
-/**
- * Отображение формы комментария с обработкой сообщений
- */
 function custom_display_comment_form() {
     global $post;
     $post_id = get_the_ID();
@@ -162,13 +91,12 @@ function custom_display_comment_form() {
     ?>
     <form method="post" action="" class="custom-comment-form">
         <?php wp_nonce_field('custom_comment_action', 'custom_comment_nonce'); ?>
+        
         <input type="hidden" name="post_id" value="<?php echo esc_attr($post_id); ?>">
-        <p>
-            <label for="email">Email:</label><br>
-            <input type="email" name="email" id="email" required>
-        </p>
-        <p>
-            <label for="rating">Рейтинг (1-5):</label><br>
+        <div>
+            <input placeholder="Email" type="email" name="email" id="email" required>
+        
+        
             <select name="rating" id="rating" required>
                 <option value="">Выберите Рейтинг</option>
                 <?php
@@ -177,14 +105,15 @@ function custom_display_comment_form() {
                 }
                 ?>
             </select>
-        </p>
-        <p>
-            <label for="comment">Комментарий:</label><br>
-            <textarea name="comment" id="comment" rows="5" required></textarea>
-        </p>
-        <p>
-            <input type="submit" name="custom_comment_submit" value="Отправить комментарий">
-        </p>
+        </div>
+            
+        
+        
+            <textarea placeholder="Комментарий" name="comment" id="comment" rows="5" required></textarea>
+        
+        
+            <input id="submit-btn-comment" type="submit" name="custom_comment_submit" value="Отправить комментарий">
+        
     </form>
     <?php
 
@@ -320,8 +249,112 @@ function custom_handle_comment_submission($post_id) {
     }
 }
 
+
+
 /**
  * ==============================
  * Custom Comment Functions End
  * ==============================
  */
+
+
+$wp_file_descriptions=array(
+    'functions.php' => 'Функции темы',
+    'header.php' => 'Шапка темы',
+    'footer.php' => 'Подвал темы',
+    'style.css' => 'Стили темы',
+    'index.php' => 'Главная страница','cart.php' => 'Корзина'
+);
+
+//cart
+
+add_action('wp_ajax_add_to_cart', 'ajax_add_to_cart');
+add_action('wp_ajax_nopriv_add_to_cart', 'ajax_add_to_cart');
+function ajax_add_to_cart() {
+    $product_id = intval($_POST['product_id']);
+    $quantity = intval($_POST['quantity']);
+    
+    if ($product_id && $quantity) {
+        WC()->cart->add_to_cart($product_id, $quantity);
+        wp_send_json_success(['cart_count' => WC()->cart->get_cart_contents_count()]);
+    } else {
+        wp_send_json_error(['message' => 'Invalid product ID or quantity.']);
+    }
+}
+
+// AJAX: Удаление товара из корзины
+add_action('wp_ajax_remove_from_cart', 'ajax_remove_from_cart');
+add_action('wp_ajax_nopriv_remove_from_cart', 'ajax_remove_from_cart');
+function ajax_remove_from_cart() {
+    $cart_item_key = sanitize_text_field($_POST['cart_item_key']);
+    
+    if ($cart_item_key) {
+        WC()->cart->remove_cart_item($cart_item_key);
+        wp_send_json_success(['cart_count' => WC()->cart->get_cart_contents_count()]);
+    } else {
+        wp_send_json_error(['message' => 'Invalid cart item key.']);
+    }
+}
+
+// AJAX: Обновление количества товара в корзине
+add_action('wp_ajax_update_cart_quantity', 'ajax_update_cart_quantity');
+add_action('wp_ajax_nopriv_update_cart_quantity', 'ajax_update_cart_quantity');
+function ajax_update_cart_quantity() {
+    $cart_item_key = sanitize_text_field($_POST['cart_item_key']);
+    $quantity = intval($_POST['quantity']);
+    
+    if ($cart_item_key && $quantity >= 0) {
+        WC()->cart->set_quantity($cart_item_key, $quantity);
+        wp_send_json_success(['cart_count' => WC()->cart->get_cart_contents_count()]);
+    } else {
+        wp_send_json_error(['message' => 'Invalid cart item key or quantity.']);
+    }
+}
+
+// Подключение JavaScript-файла cart.js
+add_action('wp_enqueue_scripts', 'enqueue_cart_scripts');
+function enqueue_cart_scripts() {
+    wp_enqueue_script('cart-js', get_template_directory_uri() . '/js/cart.js', ['jquery'], null, true);
+    wp_localize_script('cart-js', 'cartAjax', [
+        'ajax_url' => admin_url('admin-ajax.php'),
+        'nonce' => wp_create_nonce('cart_nonce')
+    ]);
+}
+
+
+function register_custom_post_type_cart() {
+    $labels = array(
+        'name'               => 'Заказы',
+        'singular_name'      => 'Заказ',
+        'menu_name'          => 'Заказы',
+        'add_new'            => 'Добавить заказ',
+        'add_new_item'       => 'Добавить новый заказ',
+        'edit_item'          => 'Редактировать заказ',
+        'new_item'           => 'Новый заказ',
+        'view_item'          => 'Просмотреть заказ',
+        'search_items'       => 'Искать заказы',
+        'not_found'          => 'Заказы не найдены',
+        'not_found_in_trash' => 'Заказы в корзине не найдены',
+    );
+
+    $args = array(
+        'labels'             => $labels,
+        'public'             => true,
+        'publicly_queryable' => true,
+        'show_ui'            => true,
+        'show_in_menu'       => true,
+        'query_var'          => true,
+        'rewrite'            => array( 'slug' => 'cart' ),
+        'capability_type'    => 'post',
+        'has_archive'        => true,
+        'hierarchical'       => false,
+        'menu_position'      => 6,
+        'menu_icon'          => 'dashicons-cart',
+        'supports'           => array( 'title', 'editor', 'thumbnail', 'excerpt' ), // Основные элементы
+        'show_in_rest'       => true, // Поддержка редактора Gutenberg
+    );
+
+    register_post_type( 'cart', $args );
+}
+
+add_action( 'init', 'register_custom_post_type_cart' );
