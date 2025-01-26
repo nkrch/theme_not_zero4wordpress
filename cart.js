@@ -50,6 +50,9 @@ function updateQuantity(title, newQuantity) {
 // Сохранение корзины в cookies
 function saveCart(cart) {
   Cookies.set("cart", JSON.stringify(cart), { expires: 7 });
+  ajaxAddToCart(); // Обновляем сервер после удаления
+
+
 }
 
 // Обновление счетчика товаров в корзине
@@ -70,18 +73,26 @@ function removeFromCart(title) {
   cart = cart.filter((item) => item.title !== title);
   saveCart(cart);
   updateCartCount();
+
   updateCartDisplay();
 }
 
-function ajaxAddToCart(product) {
-  jQuery.post(ajaxurl, { action: "add_to_cart", product }, function (response) {
-    if (response.success) {
-      updateCartCount();
-    }
-  });
+function ajaxAddToCart() {
+
+  location.reload();
 }
 
 function calculateTotal() {
   const cart = getCart();
   return cart.reduce((total, item) => total + item.price * item.quantity, 0);
+}
+
+function updateFromCartPage(product, newQuantity) {
+  const cart = getCart();
+  const productIndex = cart.findIndex((item) => item.title === product);
+  cart[productIndex].quantity = newQuantity;
+  if (newQuantity <= 0) {
+    removeFromCart(product);
+  }
+  saveCart(cart);
 }
