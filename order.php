@@ -1,5 +1,5 @@
 <?php
-/* Template Name: Cart */
+/* Template Name: Order */
 get_header(); ?>
 <main class="card-container">
     <h1>Корзина</h1>
@@ -59,15 +59,23 @@ get_header(); ?>
 
         echo '</tbody>';
         echo '</table>';
-        echo "<a id='order' href=" . site_url('/order') . ">ЗАКАЗАТЬ</a>";
         echo '</div>';
 
         wp_reset_postdata();
     }
     ?>
+
+    <h1>Данные пользователя</h1>
+    <form>
+        <input type="text" placeholder="Имя"/>
+        <input type="email" placeholder="Email"/>
+        <button onClick="orderFunc(event)">Заказать</button>
+    </form>
 </main>
 
-
+<script>
+    
+</script>
 
 <?php
 get_footer();

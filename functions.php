@@ -358,3 +358,4 @@ function register_custom_post_type_cart() {
 }
 
 add_action( 'init', 'register_custom_post_type_cart' );
+
