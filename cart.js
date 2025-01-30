@@ -1,6 +1,6 @@
 //Создайте файл cart.js в вашей теме.
 //Реализуйте функции для добавления товаров в корзину,
-function submitFunc(product, price, description, image) {
+function submitFunc(product, price, description, image, id) {
   console.log(product);
   const cart = getCart();
   console.log("###cart");
@@ -16,7 +16,7 @@ function submitFunc(product, price, description, image) {
     );
   } else {
     console.log("###new cart");
-    cart.push({ title: product, quantity: 1, price, description, image });
+    cart.push({ title: product, quantity: 1, price, description, image, id });
     saveCart(cart);
   }
 
@@ -27,7 +27,7 @@ function submitFunc(product, price, description, image) {
 // Получение корзины из cookies
 function getCart() {
   const cart = Cookies.get("cart");
-
+  console.log(cart);
   return cart ? JSON.parse(cart) : [];
 }
 
@@ -51,8 +51,6 @@ function updateQuantity(title, newQuantity) {
 function saveCart(cart) {
   Cookies.set("cart", JSON.stringify(cart), { expires: 7 });
   ajaxAddToCart(); // Обновляем сервер после удаления
-
-
 }
 
 // Обновление счетчика товаров в корзине
@@ -78,7 +76,6 @@ function removeFromCart(title) {
 }
 
 function ajaxAddToCart() {
-
   location.reload();
 }
 
@@ -96,3 +93,68 @@ function updateFromCartPage(product, newQuantity) {
   }
   saveCart(cart);
 }
+
+function orderFunc(event, siteUrl) {
+  event.preventDefault();
+  const dbUrl = siteUrl + "/wp-admin/admin-ajax.php";
+  const orderData = {
+    name: document.querySelector("input[placeholder='Имя']").value,
+    email: document.querySelector("input[placeholder='Email']").value,
+
+    cart: getCart(),
+  };
+
+  sendAjax(orderData, dbUrl);
+}
+//use local domain
+//create local domain
+//in settings of wordpress in generals rewrite rules
+//
+
+function sendAjax(data, url) {
+  console.log(data);
+  console.log(url);
+
+  // Преобразуем данные в формат, ожидаемый WordPress (FormData)
+  const formData = new FormData();
+  formData.append("action", "create_order"); // WordPress ожидает поле "action"
+  formData.append("data", JSON.stringify(data)); // Передаем сериализованные данные
+  fetch(url, {
+    method: "POST",
+    body: formData,
+  })
+    .then((res) => {
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      return res.text();
+    })
+    .then((data) => {
+      console.log("Response:", JSON.parse(data));
+      document.querySelector("form").reset();
+      deleteCart();
+    })
+    .catch((err) => console.error("Error:", err));
+}
+
+function deleteCart() {
+  Cookies.remove("cart");
+  location.reload();
+}
+
+function ajaxUserCartSave(data, url, option) {
+  switch (option) {
+    case "update-existing":
+      break;
+    case "delete-existing":
+      break;
+    case "create-new":
+      createAjaxCartSave(data, url);
+      break;
+
+    default:
+      break;
+  }
+}
+
+function createAjaxCartSave(data, url) {}

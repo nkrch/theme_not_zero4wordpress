@@ -6,6 +6,7 @@
     <script src="https://code.jquery.com/jquery-migrate-3.4.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 <script src="<?php echo get_template_directory_uri(); ?>/cart.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/3.0.5/js.cookie.min.js"></script>
 
     <?php wp_head(); ?>
     <title><?php bloginfo('name'); ?></title>

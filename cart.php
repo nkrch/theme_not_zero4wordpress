@@ -6,6 +6,8 @@ get_header(); ?>
 
     <?php
     // Получение данных корзины из куки
+
+    
     $cart_cookie = isset($_COOKIE['cart']) ? json_decode(stripslashes($_COOKIE['cart']), true) : [];
     if (empty($cart_cookie)) {
         echo '<p>Корзина пуста :(</p>';
@@ -36,8 +38,8 @@ get_header(); ?>
             }
             echo '<td>' . esc_html($price) . ' руб.</td>';
             echo '<td>' . esc_html($quantity) . ' 
-                <button class="rem-add-btn" onClick="updateFromCartPage(`' . $name . '`, ' . ($quantity + 1) . ')">+</button>
-                <button class="rem-add-btn" onClick="updateFromCartPage(`' . $name . '`, ' . ($quantity - 1) . ')">-</button>
+                <button class="rem-add-btn" onClick="updateFromCartPage(`' . $name . '`, ' . ($quantity + 1) . ', ``)">+</button>
+                <button class="rem-add-btn" onClick="updateFromCartPage(`' . $name . '`, ' . ($quantity - 1) . ', ``)">-</button>
                 <button class="rem-add-btn" id="delete-btn" onClick="removeFromCart(`' . $name . '`)"><svg fill="#000000" height="14px" width="14px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
 	 viewBox="0 0 290 290" xml:space="preserve">
 <g id="XMLID_24_">

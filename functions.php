@@ -5,7 +5,7 @@ function enqueue_theme_styles_and_scripts() {
     wp_enqueue_style('theme-style', get_stylesheet_uri());
 
     wp_enqueue_script('bootstrap-js', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js', array('jquery'), null, true);
-    wp_enqueue_script('cart-script', get_template_directory_uri() . './cart.js', array('jquery'), null, true);}
+    wp_enqueue_script('cart-script', site_url().'cart.js', array('jquery'), null, true);}
 
 add_action('wp_enqueue_scripts', 'enqueue_theme_styles_and_scripts');
 
@@ -359,3 +359,140 @@ function register_custom_post_type_cart() {
 
 add_action( 'init', 'register_custom_post_type_cart' );
 
+
+//AJAX 
+add_action('wp_ajax_create_order', 'handle_order');
+add_action('wp_ajax_nopriv_create_order', 'handle_order');
+
+
+function handle_order() {
+    // Получаем данные из POST-запроса
+    $data = json_decode(stripslashes($_POST['data']), true);
+
+    // Проверяем обязательные поля
+    if (empty($data['name'])) {
+        wp_send_json_error(['message' => 'Необходимо заполнить все обязательные поля!', 'data' => $data]);
+        exit;
+    }
+    if (empty($data['cart']) || !is_array($data['cart'])) {
+        wp_send_json_error(['message' => 'Не переданы заказы!']);
+        exit;
+    }
+
+    // Собираем данные из POST-запроса
+    $customer_name = $data['name'];
+    $customer_email = $data['email'];
+    $cart = $data['cart']; // Массив товаров
+
+    // Генерируем уникальный идентификатор заказа
+    $id_order = uniqid();
+
+    // Создаем новую запись типа order
+    $order_id = wp_insert_post([
+        'post_type'   => 'cart',
+        'post_title'  => 'Order for ' . $customer_name . ' № ' . $id_order,
+        'post_status' => 'publish',
+    ]);
+
+    // Проверяем, что запись создана успешно
+    if (!$order_id || is_wp_error($order_id)) {
+        wp_send_json_error(['message' => 'Ошибка создания записи!']);
+        exit;
+    }
+
+    
+    // Сохраняем обработанный массив товаров в метаполе
+    if (!empty($products)) {
+        update_post_meta($order_id, 'products', $products);
+    }
+
+    // Сброс постданных
+    wp_reset_postdata();
+
+    // Устанавливаем значения для ACF полей (если используется ACF)
+    update_field('fio_user', $customer_name, $order_id);
+    update_field('email', $customer_email, $order_id);
+    update_field('id', $id_order, $order_id);
+
+    // Возвращаем успешный ответ
+    wp_send_json_success(['message' => 'Заказ успешно создан!', 'order_id' => $order_id]);
+    wp_die(); // Завершаем выполнение
+}
+
+//META TRY 5
+
+function save_cart_items_meta($post_id) {
+    // Make sure we are saving data only for the 'cart' post type
+    if (get_post_type($post_id) != 'cart') {
+        return;
+    }
+
+    // Example: Cart items data (replace this with your actual cart logic)
+    $cart_items = [];
+
+if (isset($_COOKIE['cart'])) {
+    $cart_data = json_decode(stripslashes($_COOKIE['cart']), true);
+
+    if (is_array($cart_data)) {
+        foreach ($cart_data as $item) {
+            $cart_items[] = $item;
+        }
+    }
+}
+
+    // Save the cart items as post meta
+    update_post_meta($post_id, '_cart_items', $cart_items);
+}
+add_action('save_post', 'save_cart_items_meta');
+
+// Add a Meta Box to the Cart Post Type in WP Admin
+function add_cart_items_meta_box() {
+    add_meta_box(
+        'cart_items_meta_box',                 // ID for the meta box
+        'Cart Items',                          // Title of the meta box
+        'display_cart_items_in_post',          // Callback function to display content
+        'cart',                                // Post type (replace with your custom post type)
+        'normal',                              // Context (normal or side)
+        'high'                                 // Priority
+    );
+}
+add_action('add_meta_boxes', 'add_cart_items_meta_box');
+
+function display_cart_items_in_post($post) {
+    // Get the cart items from post meta
+    $cart_items = get_post_meta($post->ID, '_cart_items', true);
+
+    // If there are no cart items, display a message
+    if (empty($cart_items)) {
+        echo '<p>No cart items found for this post.</p>';
+        return;
+    }
+
+    // Display the cart items in a table format
+    echo '<table class="wp-list-table widefat fixed striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>';
+
+    // Loop through the cart items and display each one
+    foreach ($cart_items as $item) {
+        $total_price = $item['price'] * $item['quantity'];
+
+        echo '<tr>
+                <td>' . esc_html($item['id']) . '</td>
+                <td>' . esc_html($item['title']) . '</td>
+                <td>' . esc_html($item['price']) . '</td>
+                <td>' . esc_html($item['quantity']) . '</td>
+                <td>' . esc_html($total_price) . '</td>
+              </tr>';
+    }
+
+    echo '</tbody></table>';
+}

@@ -65,12 +65,33 @@ get_header(); ?>
     }
     ?>
 
+<?php 
+    $siteUrl=site_url();
+    echo $siteUrl
+?>
+
     <h1>Данные пользователя</h1>
     <form>
         <input type="text" placeholder="Имя"/>
         <input type="email" placeholder="Email"/>
-        <button onClick="orderFunc(event)">Заказать</button>
+        <button onClick="orderFunc(event, `<?php echo $siteUrl ?>`)">Заказать</button>
     </form>
+    <?php $value = get_post_meta(get_the_ID(), '_meta_key', true);
+if (!empty($value)) {
+    echo '<p>Дополнительная информация: ' . esc_html($value) . '</p>';
+    // Получение массива товаров
+$cart = get_post_meta($order_id, 'cart', true);
+if (!empty($cart)) {
+    foreach ($cart as $product) {
+        echo 'ID товара: ' . $product['id'] . '<br>';
+        echo 'Название: ' . $product['name'] . '<br>';
+        echo 'Цена: ' . $product['price'] . '<br>';
+        echo 'Количество: ' . $product['quantity'] . '<br><br>';
+    }
+}
+} else {
+    echo '<p>Мета-поле пустое.</p>';
+}?>
 </main>
 
 <script>
