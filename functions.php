@@ -4,9 +4,8 @@ function enqueue_theme_styles_and_scripts() {
     // Подключение основного файла стилей
     wp_enqueue_style('theme-style', get_stylesheet_uri());
 
-    // Подключение Bootstrap JS (убедитесь, что используете корректную версию)
     wp_enqueue_script('bootstrap-js', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js', array('jquery'), null, true);
-}
+    wp_enqueue_script('cart-script', site_url().'cart.js', array('jquery'), null, true);}
 
 add_action('wp_enqueue_scripts', 'enqueue_theme_styles_and_scripts');
 
@@ -69,76 +68,6 @@ function include_product_in_archive( $query ) {
 }
 add_action('pre_get_posts', 'include_product_in_archive');
 
-/**
- * ================================
- * Custom Comment Functions Start
- * ================================
- */
-
-// Обработка отправки формы комментария
-/*function custom_handle_comment_submission($post_id) {
-    // Проверка nonce для безопасности
-    if ( ! isset($_POST['custom_comment_nonce']) || ! wp_verify_nonce($_POST['custom_comment_nonce'], 'custom_comment_action') ) {
-        echo '<p style="color:red;">Security check failed. Please try again.</p>';
-        return;
-    }
-
-    // Санитизация и валидация введенных данных
-    $email = sanitize_email($_POST['email']);
-    $rating = intval($_POST['rating']);
-    $comment_content = sanitize_textarea_field($_POST['comment']);
-
-    $errors = array();
-
-    if ( ! is_email($email) ) {
-        $errors[] = 'Please enter a valid email address.';
-    }
-
-    if ( $rating < 1 || $rating > 5 ) {
-        $errors[] = 'Rating must be between 1 and 5.';
-    }
-
-    if ( empty($comment_content) ) {
-        $errors[] = 'Please enter a comment.';
-    }
-
-    if ( ! empty($errors) ) {
-        foreach ( $errors as $error ) {
-            echo '<p style="color:red;">' . esc_html($error) . '</p>';
-        }
-        return;
-    }
-
-    // Подготовка данных комментария
-    $current_user = wp_get_current_user();
-
-    $commentdata = array(
-        'comment_post_ID'      => $post_id,
-        'comment_author'       => $current_user->exists() ? $current_user->display_name : 'Anonymous',
-        'comment_author_email' => $email,
-        'comment_content'      => $comment_content,
-        'comment_type'         => '', // '' для обычных комментариев
-        'comment_parent'       => 0,
-        'user_id'              => $current_user->ID,
-        'comment_approved'     => 1, // Автоматическое одобрение; установить 0 для ручного одобрения
-    );
-
-    // Вставка комментария в базу данных
-    $comment_id = wp_insert_comment($commentdata);
-
-    if ( $comment_id ) {
-        // Добавление рейтинга как мета данных комментария
-        add_comment_meta($comment_id, 'rating', $rating);
-        echo '<p style="color:green;">Thank you for your comment!</p>';
-    } else {
-        echo '<p style="color:red;">There was an error submitting your comment. Please try again.</p>';
-    }
-}*/
-
-// Отображение формы комментария
-/**
- * Отображение формы комментария с обработкой сообщений
- */
 function custom_display_comment_form() {
     global $post;
     $post_id = get_the_ID();
@@ -162,13 +91,12 @@ function custom_display_comment_form() {
     ?>
     <form method="post" action="" class="custom-comment-form">
         <?php wp_nonce_field('custom_comment_action', 'custom_comment_nonce'); ?>
+        
         <input type="hidden" name="post_id" value="<?php echo esc_attr($post_id); ?>">
-        <p>
-            <label for="email">Email:</label><br>
-            <input type="email" name="email" id="email" required>
-        </p>
-        <p>
-            <label for="rating">Рейтинг (1-5):</label><br>
+        <div>
+            <input placeholder="Email" type="email" name="email" id="email" required>
+        
+        
             <select name="rating" id="rating" required>
                 <option value="">Выберите Рейтинг</option>
                 <?php
@@ -177,14 +105,15 @@ function custom_display_comment_form() {
                 }
                 ?>
             </select>
-        </p>
-        <p>
-            <label for="comment">Комментарий:</label><br>
-            <textarea name="comment" id="comment" rows="5" required></textarea>
-        </p>
-        <p>
-            <input type="submit" name="custom_comment_submit" value="Отправить комментарий">
-        </p>
+        </div>
+            
+        
+        
+            <textarea placeholder="Комментарий" name="comment" id="comment" rows="5" required></textarea>
+        
+        
+            <input id="submit-btn-comment" type="submit" name="custom_comment_submit" value="Отправить комментарий">
+        
     </form>
     <?php
 
@@ -320,8 +249,414 @@ function custom_handle_comment_submission($post_id) {
     }
 }
 
+
+
 /**
  * ==============================
  * Custom Comment Functions End
  * ==============================
  */
+
+
+$wp_file_descriptions=array(
+    'functions.php' => 'Функции темы',
+    'header.php' => 'Шапка темы',
+    'footer.php' => 'Подвал темы',
+    'style.css' => 'Стили темы',
+    'index.php' => 'Главная страница','cart.php' => 'Корзина'
+);
+
+//cart
+
+add_action('wp_ajax_add_to_cart', 'ajax_add_to_cart');
+add_action('wp_ajax_nopriv_add_to_cart', 'ajax_add_to_cart');
+function ajax_add_to_cart() {
+    $product_id = intval($_POST['product_id']);
+    $quantity = intval($_POST['quantity']);
+    
+    if ($product_id && $quantity) {
+        WC()->cart->add_to_cart($product_id, $quantity);
+        wp_send_json_success(['cart_count' => WC()->cart->get_cart_contents_count()]);
+    } else {
+        wp_send_json_error(['message' => 'Invalid product ID or quantity.']);
+    }
+}
+
+// AJAX: Удаление товара из корзины
+add_action('wp_ajax_remove_from_cart', 'ajax_remove_from_cart');
+add_action('wp_ajax_nopriv_remove_from_cart', 'ajax_remove_from_cart');
+function ajax_remove_from_cart() {
+    $cart_item_key = sanitize_text_field($_POST['cart_item_key']);
+    
+    if ($cart_item_key) {
+        WC()->cart->remove_cart_item($cart_item_key);
+        wp_send_json_success(['cart_count' => WC()->cart->get_cart_contents_count()]);
+    } else {
+        wp_send_json_error(['message' => 'Invalid cart item key.']);
+    }
+}
+
+// AJAX: Обновление количества товара в корзине
+add_action('wp_ajax_update_cart_quantity', 'ajax_update_cart_quantity');
+add_action('wp_ajax_nopriv_update_cart_quantity', 'ajax_update_cart_quantity');
+function ajax_update_cart_quantity() {
+    $cart_item_key = sanitize_text_field($_POST['cart_item_key']);
+    $quantity = intval($_POST['quantity']);
+    
+    if ($cart_item_key && $quantity >= 0) {
+        WC()->cart->set_quantity($cart_item_key, $quantity);
+        wp_send_json_success(['cart_count' => WC()->cart->get_cart_contents_count()]);
+    } else {
+        wp_send_json_error(['message' => 'Invalid cart item key or quantity.']);
+    }
+}
+
+// Подключение JavaScript-файла cart.js
+add_action('wp_enqueue_scripts', 'enqueue_cart_scripts');
+function enqueue_cart_scripts() {
+    wp_enqueue_script('cart-js', get_template_directory_uri() . '/js/cart.js', ['jquery'], null, true);
+    wp_localize_script('cart-js', 'cartAjax', [
+        'ajax_url' => admin_url('admin-ajax.php'),
+        'nonce' => wp_create_nonce('cart_nonce')
+    ]);
+}
+
+
+function register_custom_post_type_cart() {
+    $labels = array(
+        'name'               => 'Заказы',
+        'singular_name'      => 'Заказ',
+        'menu_name'          => 'Заказы',
+        'add_new'            => 'Добавить заказ',
+        'add_new_item'       => 'Добавить новый заказ',
+        'edit_item'          => 'Редактировать заказ',
+        'new_item'           => 'Новый заказ',
+        'view_item'          => 'Просмотреть заказ',
+        'search_items'       => 'Искать заказы',
+        'not_found'          => 'Заказы не найдены',
+        'not_found_in_trash' => 'Заказы в корзине не найдены',
+    );
+
+    $args = array(
+        'labels'             => $labels,
+        'public'             => true,
+        'publicly_queryable' => true,
+        'show_ui'            => true,
+        'show_in_menu'       => true,
+        'query_var'          => true,
+        'rewrite'            => array( 'slug' => 'cart' ),
+        'capability_type'    => 'post',
+        'has_archive'        => true,
+        'hierarchical'       => false,
+        'menu_position'      => 6,
+        'menu_icon'          => 'dashicons-cart',
+        'supports'           => array( 'title', 'editor', 'thumbnail', 'excerpt' ), // Основные элементы
+        'show_in_rest'       => true, // Поддержка редактора Gutenberg
+    );
+
+    register_post_type( 'cart', $args );
+}
+
+add_action( 'init', 'register_custom_post_type_cart' );
+
+
+//AJAX 
+add_action('wp_ajax_create_order', 'handle_order');
+add_action('wp_ajax_nopriv_create_order', 'handle_order');
+
+
+function handle_order() {
+    // Получаем данные из POST-запроса
+    $data = json_decode(stripslashes($_POST['data']), true);
+
+    // Проверяем обязательные поля
+    if (empty($data['name'])) {
+        wp_send_json_error(['message' => 'Необходимо заполнить все обязательные поля!', 'data' => $data]);
+        exit;
+    }
+    if (empty($data['cart']) || !is_array($data['cart'])) {
+        wp_send_json_error(['message' => 'Не переданы заказы!']);
+        exit;
+    }
+
+    // Собираем данные из POST-запроса
+    $customer_name = $data['name'];
+    $customer_email = $data['email'];
+    $cart = $data['cart']; // Массив товаров
+
+    // Генерируем уникальный идентификатор заказа
+    $id_order = uniqid();
+
+    // Создаем новую запись типа order
+    $order_id = wp_insert_post([
+        'post_type'   => 'cart',
+        'post_title'  => 'Order for ' . $customer_name . ' № ' . $id_order,
+        'post_status' => 'publish',
+    ]);
+
+    // Проверяем, что запись создана успешно
+    if (!$order_id || is_wp_error($order_id)) {
+        wp_send_json_error(['message' => 'Ошибка создания записи!']);
+        exit;
+    }
+
+    
+    // Сохраняем обработанный массив товаров в метаполе
+    if (!empty($products)) {
+        update_post_meta($order_id, 'products', $products);
+    }
+
+    // Сброс постданных
+    wp_reset_postdata();
+
+    // Устанавливаем значения для ACF полей (если используется ACF)
+    update_field('fio_user', $customer_name, $order_id);
+    update_field('email', $customer_email, $order_id);
+    update_field('id', $id_order, $order_id);
+
+    // Возвращаем успешный ответ
+    wp_send_json_success(['message' => 'Заказ успешно создан!', 'order_id' => $order_id]);
+    wp_die(); // Завершаем выполнение
+}
+
+//META TRY 5
+
+function save_cart_items_meta($post_id) {
+    // Make sure we are saving data only for the 'cart' post type
+    if (get_post_type($post_id) != 'cart') {
+        return;
+    }
+
+    // Example: Cart items data (replace this with your actual cart logic)
+    $cart_items = [];
+
+if (isset($_COOKIE['cart'])) {
+    $cart_data = json_decode(stripslashes($_COOKIE['cart']), true);
+
+    if (is_array($cart_data)) {
+        foreach ($cart_data as $item) {
+            $cart_items[] = $item;
+        }
+    }
+}
+
+    // Save the cart items as post meta
+    update_post_meta($post_id, '_cart_items', $cart_items);
+}
+add_action('save_post', 'save_cart_items_meta');
+
+// Add a Meta Box to the Cart Post Type in WP Admin
+function add_cart_items_meta_box() {
+    add_meta_box(
+        'cart_items_meta_box',                 // ID for the meta box
+        'Cart Items',                          // Title of the meta box
+        'display_cart_items_in_post',          // Callback function to display content
+        'cart',                                // Post type (replace with your custom post type)
+        'normal',                              // Context (normal or side)
+        'high'                                 // Priority
+    );
+}
+add_action('add_meta_boxes', 'add_cart_items_meta_box');
+
+function display_cart_items_in_post($post) {
+    // Get the cart items from post meta
+    $cart_items = get_post_meta($post->ID, '_cart_items', true);
+    $post_id = $post->ID;
+    // If there are no cart items, display a message
+    if (empty($cart_items)) {
+        echo '<p>No cart items found for this post.</p>';
+echo '<div class="cart-btns">
+    <button id="add-product-btn" onClick="func_ADMIN_addProductToCart()">Добавить товар</button>
+    </div>';
+        return;
+    }
+
+    // Display the cart items in a table format
+    echo '<table class="wp-list-table widefat fixed striped">
+            <caption>'.$post_id.', ' . get_field('id', $post_id).'</caption>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Total</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>';
+
+    // Loop through the cart items and display each one
+    foreach ($cart_items as $item) {
+        $total_price = $item['price'] * $item['quantity'];
+
+        echo '<tr>
+                <td>' . esc_html($item['id']) . '</td>
+                <td>' . esc_html($item['title']) . '</td>
+                <td>' . esc_html($item['price']) . '</td>
+                <td>' . esc_html($item['quantity']) . '</td>
+                <td>' . esc_html($total_price) . '</td>
+                <td><button onClick="func_ADMIN_removeFromCart(`' . esc_html($item['title']).  '`, '  . esc_html($post_id). ','. site_url() . ', `' . $post_id . '`)">Удалить</button>
+                <button onClick="func_ADMIN_changeOrder(`' . esc_html($item['title']). '`,'. esc_html($item['quantity']) . ', ' . esc_html($item['id']) . ',' . esc_html($item['price']). ', `' . esc_html($post_id). '` , `'. site_url() . '`,`'.$post_id .'`)">Изменить</button></td>
+              </tr>';
+    }
+
+    echo '</tbody></table>
+    <div class="cart-btns">
+    <button id="add-product-btn" onClick="func_ADMIN_addProductToCart(`'. site_url() . '`, `'.$post_id.'`)">Добавить товар</button>
+    <button id="clear-cart-btn" onClick="func_ADMIN_clearCart('. $post_id.')">Очистить корзину</button>
+    </div>
+    
+    ';
+}
+
+
+// Enqueue admin script and pass AJAX URL
+function admin_scripts() {
+    wp_enqueue_script('admin-script', get_template_directory_uri() . '/admin.js', array('jquery'), '1.0.0', true);
+
+    // Pass AJAX URL to JavaScript
+    wp_localize_script('admin-script', 'ajax_object', array('ajax_url' => admin_url('admin-ajax.php')));
+}
+add_action('admin_enqueue_scripts', 'admin_scripts');
+
+// Get products for select in admin
+function get_products_for_select() {
+    global $wpdb;
+
+    // Query to get published WooCommerce products
+    $products = $wpdb->get_results("
+        SELECT ID as id, post_title as title
+        FROM {$wpdb->prefix}posts 
+        WHERE post_type = 'product' AND post_status = 'publish'
+    ");
+
+    if (empty($products)) {
+        wp_send_json_error(['message' => 'No products found']);
+        wp_die();
+    }
+
+    // Fetch ACF fields for each product (if ACF is installed)
+    $products_with_acf = [];
+    foreach ($products as $product) {
+        $acf_fields = function_exists('get_fields') ? get_fields($product->id) : []; // Get ACF data
+
+        $products_with_acf[] = [
+            'id' => $product->id,
+            'title' => $product->title,
+            'acf' => $acf_fields // Attach ACF fields
+        ];
+    }
+
+    wp_send_json_success(['message' => 'ACHIEVED', 'products' => $products_with_acf]);
+    wp_die();
+}
+
+add_action('wp_ajax_get_products_for_select', 'get_products_for_select');
+add_action('wp_ajax_nopriv_get_products_for_select', 'get_products_for_select');
+
+function get_exact_product() {
+    if (!isset($_GET['product_id']) || empty($_GET['product_id'])) {
+        wp_send_json_error(['message' => 'Missing product ID']);
+        wp_die();
+    }
+
+    $product_id = intval($_GET['product_id']);
+    $product = get_post($product_id); // Fetch the product from WP database
+
+    if (!$product) {
+        wp_send_json_error(['message' => 'Product not found']);
+        wp_die();
+    }
+
+    // Fetch ACF values (if ACF is installed)
+    $acf_fields = function_exists('get_fields') ? get_fields($product_id) : [];
+
+    $product_data = [
+        'id' => $product->ID,
+        'title' => $product->post_title,
+        'content' => $product->post_content,
+        'acf' => $acf_fields, // Attach ACF fields if available
+    ];
+
+    wp_send_json_success(['message' => 'Product found', 'product' => $product_data]);
+    wp_die();
+}
+
+add_action('wp_ajax_get_exact_product', 'get_exact_product');
+add_action('wp_ajax_nopriv_get_exact_product', 'get_exact_product');
+
+
+//GET ORDERS
+
+add_action('wp_ajax_get_orders', 'get_orders');
+add_action('wp_ajax_nopriv_get_orders', 'get_orders'); // Allow access for non-logged-in users if needed
+
+function get_orders() {
+    // Security: Prevent unauthorized access
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error(['message' => 'Unauthorized'], 403);
+        wp_die();
+    }
+
+    global $wpdb;
+    $orders = [];
+
+    // Secure SQL query using prepare()
+    $results = $wpdb->get_results($wpdb->prepare("
+        SELECT ID, post_title
+        FROM {$wpdb->prefix}posts
+        WHERE post_type = %s
+        ORDER BY post_date DESC
+       
+    ", 'cart'));
+
+    foreach ($results as $order) {
+        // Fetch ACF custom fields
+        $acf_fio_user = get_post_meta($order->ID, 'fio_user', true);
+        $acf_email = get_post_meta($order->ID, 'email', true);
+        $acf_id = get_post_meta($order->ID, 'id', true);
+
+        // Fetch Cart (meta field)
+      $cart = get_post_meta($order->ID, '_cart_items', true);
+
+if (is_serialized($cart)) {
+    $cart = unserialize($cart);
+} elseif (is_string($cart)) {
+    $decoded_cart = json_decode($cart, true);
+    $cart = json_last_error() === JSON_ERROR_NONE ? $decoded_cart : $cart;
+}
+
+// Add order data to response array
+$orders[] = [
+    'id' => $order->ID,
+    'title' => $order->post_title,
+
+    // ACF Fields
+    'acf' => [
+        'fio_user' => $acf_fio_user,
+        'email' => $acf_email,
+        'id' => $acf_id
+    ],
+
+    // Cart Meta Fields
+    'cart' => $cart,
+];
+    }
+
+    // Send JSON response
+    wp_send_json_success(json_encode($orders));
+    wp_die();
+}
+
+
+function resave_orders() {
+   //rewrite completely
+   //checks orders, fiend the one, that differs, changes it and saves it
+   
+    wp_send_json_success(['message' => 'Cart saved to meta fields']);
+    wp_die();
+}
+
+add_action('wp_ajax_resave_orders', 'resave_orders');
+add_action('wp_ajax_nopriv_resave_orders', 'resave_orders'); // For non-logged-in users
