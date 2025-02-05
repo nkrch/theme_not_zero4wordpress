@@ -461,6 +461,7 @@ add_action('add_meta_boxes', 'add_cart_items_meta_box');
 function display_cart_items_in_post($post) {
     // Get the cart items from post meta
     $cart_items = get_post_meta($post->ID, '_cart_items', true);
+<<<<<<< HEAD
     $post_id = $post->ID;
     // If there are no cart items, display a message
     if (empty($cart_items)) {
@@ -468,12 +469,21 @@ function display_cart_items_in_post($post) {
 echo '<div class="cart-btns">
     <button id="add-product-btn" onClick="func_ADMIN_addProductToCart()">Добавить товар</button>
     </div>';
+=======
+
+    // If there are no cart items, display a message
+    if (empty($cart_items)) {
+        echo '<p>No cart items found for this post.</p>';
+>>>>>>> ac713c0c0f6c69bcbfd94d877cb1b15f75a340cd
         return;
     }
 
     // Display the cart items in a table format
     echo '<table class="wp-list-table widefat fixed striped">
+<<<<<<< HEAD
             <caption>'.$post_id.', ' . get_field('id', $post_id).'</caption>
+=======
+>>>>>>> ac713c0c0f6c69bcbfd94d877cb1b15f75a340cd
             <thead>
                 <tr>
                     <th>ID</th>
@@ -481,7 +491,10 @@ echo '<div class="cart-btns">
                     <th>Price</th>
                     <th>Quantity</th>
                     <th>Total</th>
+<<<<<<< HEAD
                     <th></th>
+=======
+>>>>>>> ac713c0c0f6c69bcbfd94d877cb1b15f75a340cd
                 </tr>
             </thead>
             <tbody>';
@@ -496,6 +509,7 @@ echo '<div class="cart-btns">
                 <td>' . esc_html($item['price']) . '</td>
                 <td>' . esc_html($item['quantity']) . '</td>
                 <td>' . esc_html($total_price) . '</td>
+<<<<<<< HEAD
                 <td><button onClick="func_ADMIN_removeFromCart(`' . esc_html($item['title']).  '`, '  . esc_html($post_id). ','. site_url() . ', `' . $post_id . '`)">Удалить</button>
                 <button onClick="func_ADMIN_changeOrder(`' . esc_html($item['title']). '`,'. esc_html($item['quantity']) . ', ' . esc_html($item['id']) . ',' . esc_html($item['price']). ', `' . esc_html($post_id). '` , `'. site_url() . '`,`'.$post_id .'`)">Изменить</button></td>
               </tr>';
@@ -660,3 +674,10 @@ function resave_orders() {
 
 add_action('wp_ajax_resave_orders', 'resave_orders');
 add_action('wp_ajax_nopriv_resave_orders', 'resave_orders'); // For non-logged-in users
+=======
+              </tr>';
+    }
+
+    echo '</tbody></table>';
+}
+>>>>>>> ac713c0c0f6c69bcbfd94d877cb1b15f75a340cd
