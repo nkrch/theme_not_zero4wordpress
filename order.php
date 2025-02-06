@@ -67,11 +67,7 @@ get_header(); ?>
 
 <?php 
     $siteUrl=site_url();
-<<<<<<< HEAD
-   
-=======
-    echo $siteUrl
->>>>>>> ac713c0c0f6c69bcbfd94d877cb1b15f75a340cd
+
 ?>
 
     <h1>Данные пользователя</h1>
@@ -93,13 +89,7 @@ if (!empty($cart)) {
         echo 'Количество: ' . $product['quantity'] . '<br><br>';
     }
 }
-<<<<<<< HEAD
 } ?>
-=======
-} else {
-    echo '<p>Мета-поле пустое.</p>';
-}?>
->>>>>>> ac713c0c0f6c69bcbfd94d877cb1b15f75a340cd
 </main>
 
 <script>

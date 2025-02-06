@@ -461,29 +461,25 @@ add_action('add_meta_boxes', 'add_cart_items_meta_box');
 function display_cart_items_in_post($post) {
     // Get the cart items from post meta
     $cart_items = get_post_meta($post->ID, '_cart_items', true);
-<<<<<<< HEAD
     $post_id = $post->ID;
-    // If there are no cart items, display a message
-    if (empty($cart_items)) {
-        echo '<p>No cart items found for this post.</p>';
-echo '<div class="cart-btns">
-    <button id="add-product-btn" onClick="func_ADMIN_addProductToCart()">Добавить товар</button>
-    </div>';
-=======
+
+    // FIX: Ensure `$cart_items` is always an array
+    if (!is_array($cart_items)) {
+        $cart_items = [];
+    }
 
     // If there are no cart items, display a message
     if (empty($cart_items)) {
         echo '<p>No cart items found for this post.</p>';
->>>>>>> ac713c0c0f6c69bcbfd94d877cb1b15f75a340cd
+        echo '<div class="cart-btns">
+            <button id="add-product-btn" onClick="func_ADMIN_addProductToCart(`'. site_url() . '`, `'.$post_id.'`)">Добавить товар</button>
+            </div>';
         return;
     }
 
     // Display the cart items in a table format
     echo '<table class="wp-list-table widefat fixed striped">
-<<<<<<< HEAD
             <caption>'.$post_id.', ' . get_field('id', $post_id).'</caption>
-=======
->>>>>>> ac713c0c0f6c69bcbfd94d877cb1b15f75a340cd
             <thead>
                 <tr>
                     <th>ID</th>
@@ -491,10 +487,7 @@ echo '<div class="cart-btns">
                     <th>Price</th>
                     <th>Quantity</th>
                     <th>Total</th>
-<<<<<<< HEAD
                     <th></th>
-=======
->>>>>>> ac713c0c0f6c69bcbfd94d877cb1b15f75a340cd
                 </tr>
             </thead>
             <tbody>';
@@ -509,8 +502,7 @@ echo '<div class="cart-btns">
                 <td>' . esc_html($item['price']) . '</td>
                 <td>' . esc_html($item['quantity']) . '</td>
                 <td>' . esc_html($total_price) . '</td>
-<<<<<<< HEAD
-                <td><button onClick="func_ADMIN_removeFromCart(`' . esc_html($item['title']).  '`, '  . esc_html($post_id). ','. site_url() . ', `' . $post_id . '`)">Удалить</button>
+                <td><button onClick="func_ADMIN_removeFromCart(`' . esc_html($item['title']).  '`, '  . esc_html($post_id). ',`'. site_url() . '`, `' . $post_id . '`)">Удалить</button>
                 <button onClick="func_ADMIN_changeOrder(`' . esc_html($item['title']). '`,'. esc_html($item['quantity']) . ', ' . esc_html($item['id']) . ',' . esc_html($item['price']). ', `' . esc_html($post_id). '` , `'. site_url() . '`,`'.$post_id .'`)">Изменить</button></td>
               </tr>';
     }
@@ -519,10 +511,9 @@ echo '<div class="cart-btns">
     <div class="cart-btns">
     <button id="add-product-btn" onClick="func_ADMIN_addProductToCart(`'. site_url() . '`, `'.$post_id.'`)">Добавить товар</button>
     <button id="clear-cart-btn" onClick="func_ADMIN_clearCart('. $post_id.')">Очистить корзину</button>
-    </div>
-    
-    ';
+    </div>';
 }
+
 
 
 // Enqueue admin script and pass AJAX URL
@@ -665,19 +656,49 @@ $orders[] = [
 
 
 function resave_orders() {
-   //rewrite completely
-   //checks orders, fiend the one, that differs, changes it and saves it
-   
-    wp_send_json_success(['message' => 'Cart saved to meta fields']);
+    if (isset($_POST['action']) && $_POST['action'] === 'resave_orders') {
+        $id = intval($_POST['id']); // Ensure ID is an integer
+        $cart_json = stripslashes($_POST['cart']); // Remove unnecessary escape characters
+        $cart = json_decode($cart_json, true); // Decode JSON string
+
+        // Ensure JSON decoding is successful
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            wp_send_json_error(['message' => 'Invalid JSON format']);
+            wp_die();
+        }
+
+        
+
+        // Store as an actual array in post meta
+        update_post_meta($id, '_cart_items', $cart); 
+
+        wp_send_json_success(['message' => 'Orders saved successfully']);
+    }
     wp_die();
 }
 
-add_action('wp_ajax_resave_orders', 'resave_orders');
-add_action('wp_ajax_nopriv_resave_orders', 'resave_orders'); // For non-logged-in users
-=======
-              </tr>';
+
+// Retrieve function
+
+function get_cart_items($id) {
+    $cart_items = get_post_meta($id, '_cart_items', true);
+    
+    // Decode JSON if it's stored as a string
+    $cart_items = json_decode($cart_items, true);
+
+    // Ensure it's an array before using foreach
+    if (!is_array($cart_items)) {
+        $cart_items = []; // Default to empty array if decoding fails
     }
 
-    echo '</tbody></table>';
+    return $cart_items;
 }
->>>>>>> ac713c0c0f6c69bcbfd94d877cb1b15f75a340cd
+
+
+
+
+add_action('wp_ajax_resave_orders', 'resave_orders');
+add_action('wp_ajax_nopriv_resave_orders', 'resave_orders'); // For non-logged-in users
+
+
+//PLUGIN SET UP

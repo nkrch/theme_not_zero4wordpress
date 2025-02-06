@@ -59,7 +59,10 @@ async function func_ADMIN_addProductToCart(url, id) {
   }
 }
 
-function func_ADMIN_clearCart() {}
+function func_ADMIN_clearCart(id) {
+  const cart = [];
+  save_orders(cart, id);
+}
 
 async function func_ADMIN_changeOrder(
   title,
@@ -121,9 +124,9 @@ async function save_add_product(event, url, id) {
 
   //normal form of order item
 
-  const product = products.filter((item) => item.title == data.name)[0];
+  const product = await products.filter((item) => item.title == data.name)[0];
   console.log("SEARCHED PRODUCT", product);
-  if (data.quantity == "" || data.quantity == "") {
+  if (data.quantity == "") {
     data.quantity = 1;
   }
   const newItemOfOrder = {
@@ -135,19 +138,37 @@ async function save_add_product(event, url, id) {
     id: product.id,
   };
   console.log(newItemOfOrder);
-
+  let newOrd = [];
   //search for exact order
-  const order = orders.filter((item) => item.id == id_order)[0].cart;
-  console.log("ORDER", order);
-  order.push(newItemOfOrder);
-  console.log("ORDER", order);
-  await post_formatting(order);
-  console.log("ORDER", order);
+  if (ordSearch !== undefined) {
+    const order = orders.filter((item) => item.id == id_order)[0].cart;
+    console.log("ORDER", order);
+    order.push(newItemOfOrder);
+    console.log("ORDER", order);
+
+    newOrd = mergeDuplicates(order);
+    console.log("NEW ORDER", newOrd);
+  } else {
+    newOrd = [newItemOfOrder];
+  }
+
+  //fetch
+  save_orders(newOrd, id_order);
 }
 
-function func_ADMIN_removeFromCart(item, id) {
+async function func_ADMIN_removeFromCart(item, id) {
   console.log(item);
   console.log(id);
+
+  const orders = await getOrders();
+
+  let order = orders.filter((item1) => item1.id == id)[0].cart;
+  console.log("ORDER", order);
+
+  order = order.filter((item1) => item1.title !== item);
+  console.log("FINAL ORDER", order);
+
+  save_orders(order, id);
 }
 
 function getCart_admin_ajax() {}
@@ -201,29 +222,15 @@ async function func_ADMIN_savePopupData() {
     }
   });
   console.log("NEW ORDER", newOrder);
-  post_formatting(newOrder);
+  post_formatting(newOrder, id_order);
 }
 
-async function post_formatting(order) {
+async function post_formatting(order, id) {
   //check if order has repeating orders
   const newOrd = mergeDuplicates(order);
   console.log("NEW ORDER", newOrd);
 
-  //FINALLY SAVE
-  let arrayOfAllOrders = await getOrders();
-
-  console.log(arrayOfAllOrders);
-
-  arrayOfAllOrders = arrayOfAllOrders.map((item) => {
-    if (item.id == id_order) {
-      item.cart = newOrd;
-    }
-    return item;
-  });
-  console.log(arrayOfAllOrders);
-
-  //сюда впихнуть сэйв
-  save_orders(arrayOfAllOrders);
+  save_orders(newOrd, id);
 }
 
 function mergeDuplicates(items) {
@@ -240,28 +247,37 @@ function mergeDuplicates(items) {
   return Object.values(merged);
 }
 
-function save_orders(orders) {
-  const url = `${ajax_object.ajax_url}?action=resave_orders`;
-  console.log(orders);
-  // Сохраняем в файл (или в БД)
-  let formData = new FormData();
-  formData.append("action", "resave_orders"); // WordPress ожидает поле "action"
-  formData.append("orders", JSON.stringify(orders)); // Передаем сериализованные данные
-  console.log(formData);
+async function save_orders(cart, id) {
+  console.log("save orders");
+  console.log(cart);
+
+  const data = new FormData();
+  data.append("action", "resave_orders"); // Add action name
+  data.append("id", id);
+  data.append("cart", JSON.stringify(cart));
+
+  const url = ajax_object.ajax_url;
+  console.log(data);
   fetch(url, {
     method: "POST",
-    body: formData,
+    body: data,
   })
-    .then((res) => {
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
-      return res.text();
-    })
+    .then((response) => response.json())
     .then((data) => {
-      console.log("Response:", JSON.parse(data));
+      console.log(data.data);
+      if (data.success) {
+        console.log("Order saved successfully!");
+        location.reload();
+      } else {
+        console.error("Error:", data.message);
+      }
     })
-    .catch((err) => console.error("Error:", err));
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+  const orders = await getOrders();
+
+  console.log(orders);
 }
 
 function popup(innerContent) {
