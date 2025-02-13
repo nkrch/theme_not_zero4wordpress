@@ -1,0 +1,11 @@
+@media (max-width: 768px) {
+    .cart-table {
+        font-size: 14px;
+    }
+    .product-list {
+        grid-template-columns: repeat(2, minmax(150px, 1fr));
+    }
+    .pagination {
+        flex-direction: column;
+    }
+}

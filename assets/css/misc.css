@@ -1,0 +1,50 @@
+
+.container-full-archive {
+    display: flex;
+}
+
+
+.container-full-archive {
+    display: flex;
+    
+}
+
+.pagination {
+    display: flex;
+    gap: 5px;
+}
+
+.pagination a {
+    color: black;
+    align-items: center;
+}
+
+.pagination a:hover {
+    text-decoration: none;
+    color: rgb(198, 48, 49);
+}
+
+.custom-comments {
+    padding-left: 10vw;
+    padding-right: 10vw;
+}
+
+.custom-comment-section {
+    padding-left: 10vw;
+    padding-right: 10vw;
+}
+
+.custom-comment-section form {
+    gap: 2vh;
+    margin-bottom: 4vh;
+}
+
+.custom-comment-section ul {
+    padding-left: 0%;
+    padding-right: 0%;
+}
+
+#basket {
+    margin-bottom: 61%;
+    margin-left: 0%;
+}

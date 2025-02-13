@@ -1,5 +1,9 @@
 //Создайте файл cart.js в вашей теме.
 //Реализуйте функции для добавления товаров в корзину,
+(function ($) {
+  console.log("✅ cart.js is loaded and running");
+})(jQuery);
+
 function submitFunc(product, price, description, image, id) {
   console.log(product);
   const cart = getCart();
@@ -12,7 +16,7 @@ function submitFunc(product, price, description, image, id) {
     console.log(cart.find((item) => item.title === product));
     updateQuantity(
       product,
-      cart.find((item) => item.title === product).quantity + 1
+      cart.find((item) => item.title === product).quantity + 1,
     );
   } else {
     console.log("###new cart");
@@ -59,6 +63,7 @@ function updateCartCount() {
   const count = cart.reduce((total, item) => total + item.quantity, 0);
   console.log(count);
 }
+
 //  изменения количества,
 // удаления товаров
 // расчета общей стоимости.
@@ -106,6 +111,7 @@ function orderFunc(event, siteUrl) {
 
   sendAjax(orderData, dbUrl);
 }
+
 //use local domain
 //create local domain
 //in settings of wordpress in generals rewrite rules

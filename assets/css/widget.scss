@@ -1,0 +1,31 @@
+
+.widget-area {
+  display: block !important;
+}
+
+.widget-container {
+  width: 18vw;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  .container-of-rating-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-wrap: wrap;
+
+
+    a {
+      margin: 0;
+      padding: 0;
+      padding-right: 5px;
+    }
+  }
+
+}
+
+.container-full-archive {
+  display: flex;
+}
+

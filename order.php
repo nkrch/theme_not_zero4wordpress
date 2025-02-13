@@ -74,6 +74,17 @@ get_header(); ?>
     <form>
         <input type="text" placeholder="Имя"/>
         <input type="email" placeholder="Email"/>
+        <div>
+            <label for="datetill">Дата, к которой заказ нужен</label>
+                    <input type="date" name="datetill"/>
+
+        </div>
+        <div>
+            <label for="workif">Нужен ли в работе?</label><input type="checkbox" name="workif" id="workif"></label>
+        </div>
+        <div>
+            <label for="alertif">Срочно?</label><input type="checkbox" name="alertif" id="alertif"></label>
+        </div>
         <button onClick="orderFunc(event, `<?php echo $siteUrl ?>`)">Заказать</button>
     </form>
     <?php $value = get_post_meta(get_the_ID(), '_meta_key', true);

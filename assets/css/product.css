@@ -1,0 +1,237 @@
+
+.pagination {
+    display: flex;
+    gap: 5px;
+}
+
+.pagination a {
+    transition-duration: 100ms;
+    color: black;
+    align-items: center;
+}
+
+.pagination a:hover {
+    transition-duration: 0ms;
+    text-decoration: none;
+    border: 0cap;
+    color: rgb(198, 48, 49);
+}
+
+img {
+    width: 90%;
+    height: 70%;
+    object-fit: contain;
+}
+
+.btn-prime {
+    width: 90%;
+    background-color: rgb(198, 48, 49);
+    border-radius: 5px;
+    height: 35px;
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-weight: 400;
+    text-transform: uppercase;
+    font-size: 13px;
+    transition-duration: 250ms;
+}
+
+.btn-prime:hover {
+    background-color: rgb(206, 153, 154);
+    color: rgb(198, 48, 49);
+    font-weight: 600;
+}
+
+#btn-prime-big {
+    max-width: 300px;
+}
+
+.product-card-big {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.right {
+    width: 30%;
+    height: auto;
+}
+
+.back {
+    margin-top: 10vh;
+}
+
+.custom-comments {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-left: 10vw;
+    padding-right: 10vw;
+}
+
+#basket {
+    width: 30px;
+    height: 30px;
+    margin-bottom: 61%;
+    background-image: url("../images/cart.png");
+    background-size: contain;
+    margin-left: 0%;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.card-container {
+    padding-top: 1.8vh;
+    padding-bottom: 4.5vh;
+    padding-left: 10vw;
+    padding-right: 10vw;
+}
+
+.action-add-btn {
+    width: 20vw;
+    height: 6vh;
+    background-color: rgb(198, 48, 49);
+    color: white;
+    transition-duration: 300ms;
+    border: 0cm;
+    border-radius: 7px;
+    font-weight: 700;
+}
+
+.action-add-btn:hover {
+    background-color: rgb(206, 153, 154);
+    color: rgb(198, 48, 49);
+}
+
+.custom-comment-section {
+    padding-left: 10vw;
+    padding-right: 10vw;
+}
+
+.custom-comment-section form {
+    display: flex;
+    flex-direction: column;
+    gap: 2vh;
+    margin-bottom: 4vh;
+}
+
+.custom-comment-section input {
+    background-color: rgba(0, 0, 255, 0);
+    border: 0cap;
+    border-bottom: 2px solid black;
+}
+
+.custom-comment-section ul {
+    padding-left: 0%;
+    padding-right: 0%;
+}
+
+#submit-btn-comment {
+    width: 20vw;
+    height: 6vh;
+    background-color: rgb(198, 48, 49);
+    color: white;
+    transition-duration: 300ms;
+    border: 0cm;
+    border-radius: 7px;
+    font-weight: 700;
+}
+
+#submit-btn-comment:hover {
+    background-color: rgb(206, 153, 154);
+    color: rgb(198, 48, 49);
+}
+
+.stars {
+    display: none;
+}
+
+#rating {
+    display: block !important;
+    margin-top: 10px;
+}
+
+.cart-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid black;
+    margin: 20px 0;
+    font-size: 16px;
+    text-align: left;
+}
+
+.cart-table th,
+.cart-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+}
+
+.cart-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+    color: #333;
+}
+
+.cart-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.cart-table tr:hover {
+    background-color: #f1f1f1;
+}
+
+.cart-table td {
+    vertical-align: middle;
+}
+
+.cart-table .rem-add-btn {
+    background-color: #333;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 14px;
+    border-radius: 5px;
+    margin: 0 5px;
+    transition: background-color 0.3s ease;
+}
+
+.cart-table .rem-add-btn:hover {
+    background-color: rgb(198, 48, 49);
+}
+
+.cart-table td:last-child {
+    font-weight: bold;
+    text-align: right;
+}
+
+.cart-table-wrapper {
+    overflow-x: auto;
+}
+
+@media (max-width: 768px) {
+    .cart-table {
+        font-size: 14px;
+    }
+}
+
+#delete-btn {
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    margin-top: 1px;
+}
+
+#delete-btn svg {
+    filter: invert(1);
+}

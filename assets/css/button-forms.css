@@ -1,0 +1,107 @@
+/* buttons-forms.css */
+.btn-prime {
+    width: 90%;
+    background-color: rgb(198, 48, 49);
+    border-radius: 5px;
+    height: 35px;
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-weight: 400;
+    text-transform: uppercase;
+    font-size: 13px;
+    transition-duration: 250ms;
+}
+
+.btn-prime:hover {
+    background-color: rgb(206, 153, 154);
+    color: rgb(198, 48, 49);
+    font-weight: 600;
+}
+
+.action-add-btn {
+    width: 20vw;
+    height: 6vh;
+    background-color: rgb(198, 48, 49);
+    color: white;
+    transition-duration: 300ms;
+    border: 0cm;
+    border-radius: 7px;
+    font-weight: 700;
+}
+
+.action-add-btn:hover {
+    background-color: rgb(206, 153, 154);
+    color: rgb(198, 48, 49);
+}
+
+.custom-comment-section form {
+    display: flex;
+    flex-direction: column;
+    gap: 2vh;
+    margin-bottom: 4vh;
+}
+
+.custom-comment-section input {
+    background-color: rgba(0, 0, 255, 0);
+    border: 0cap;
+    border-bottom: 2px solid black;
+}
+
+.btn-prime, .action-add-btn, #submit-btn-comment {
+    background-color: rgb(198, 48, 49);
+    color: white;
+    border-radius: 5px;
+    transition-duration: 250ms;
+    font-weight: 400;
+    text-transform: uppercase;
+    font-size: 13px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 35px;
+    width: 90%;
+}
+
+.btn-prime:hover, .action-add-btn:hover, #submit-btn-comment:hover {
+    background-color: rgb(206, 153, 154);
+    color: rgb(198, 48, 49);
+    font-weight: 600;
+}
+
+#btn-prime-big {
+    max-width: 300px;
+}
+
+.custom-comment-section form {
+    display: flex;
+    flex-direction: column;
+    gap: 2vh;
+    margin-bottom: 4vh;
+}
+
+.custom-comment-section input {
+    background-color: transparent;
+    border: none;
+    border-bottom: 2px solid black;
+}
+
+.btn-prime {
+    margin-top: 10px;
+}
+
+/* cart-table.css */
+.cart-table {
+    margin: 20px 0;
+}
+
+.cart-table th, .cart-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+}
+
+.cart-table-wrapper {
+    overflow-x: auto;
+}

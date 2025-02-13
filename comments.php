@@ -45,7 +45,8 @@ function custom_handle_comment_submission($post_id) {
         'comment_type'         => '', // '' for regular comments
         'comment_parent'       => 0,
         'user_id'              => $current_user->ID,
-        'comment_approved'     => 1, // Auto-approve; set to 0 if you want manual approval
+        'comment_approved'     => 1,
+        'rating'=>$rating// Auto-approve; set to 0 if you want manual approval
     );
 
     // Insert the comment into the database
