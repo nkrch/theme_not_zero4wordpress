@@ -3,23 +3,28 @@
 <head>
     <meta charset="<?php bloginfo('charset'); ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+    <script src="<?php echo get_template_directory_uri(); ?>/assets/js/cart.js"></script>
+    <script src="<?php echo get_template_directory_uri(); ?>/assets/js/auth.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/3.0.1/js.cookie.min.js"></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-            crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/3.0.5/js.cookie.min.js"></script>
-    <script src="<?php get_template_directory_uri() ?>/js/cart.js" defer></script>
-    <?php wp_head(); ?>
+    <?php wp_head(); ?> <!-- WordPress hook -->
     <title><?php bloginfo('name'); ?></title>
 </head>
+
+<?php
+$current_user = wp_get_current_user();
+if (!($current_user instanceof WP_User)) {
+    return;
+}
+
+?>
 <body <?php body_class(); ?>>
 
 <header>
     <h1><?php bloginfo('name'); ?></h1>
+
+
     <nav class="main-navigation">
-
-
         <ul>
             <li><a href="<?php echo home_url(); ?>">Главная</a></li>
             <li><a href="<?php echo get_post_type_archive_link('product'); ?>">Каталог</a></li>
@@ -35,9 +40,5 @@
                 <button onclick="startAuth()">Регистрация/Вход</button>
             </li>
         </ul>
-
-        <?php wp_reset_postdata(); ?>
     </nav>
 </header>
-
-

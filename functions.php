@@ -4,7 +4,6 @@ function enqueue_theme_styles_and_scripts()
 {
     // Enqueue main stylesheet
     wp_enqueue_style('theme-style', get_stylesheet_uri());
-    wp_enqueue_script('jquery');
 
     // Enqueue custom CSS files
     wp_enqueue_style('base-style', get_template_directory_uri() . '/assets/css/base.css');
@@ -14,30 +13,31 @@ function enqueue_theme_styles_and_scripts()
     wp_enqueue_style('cart-table-style', get_template_directory_uri() . '/assets/css/cart-table.css');
     wp_enqueue_style('responsive-style', get_template_directory_uri() . '/assets/css/responsive.css');
     wp_enqueue_style('misc-style', get_template_directory_uri() . '/assets/css/misc.css');
-    wp_enqueue_style('widget-style', get_template_directory_uri() . '/assets/css/widget.scss'); // Use compiled CSS
+    wp_enqueue_style('widget-style', get_template_directory_uri() . '/assets/css/widget.scss');
+    wp_enqueue_style('switcher-style', get_template_directory_uri() . '/assets/css/switcher.scss');
 
-    // Enqueue scripts
+    // Enqueue jQuery, as it's a dependency for your scripts
+
+
+    // Enqueue Bootstrap JS after jQuery and your scripts
     wp_enqueue_script('bootstrap-js', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js', array('jquery'), null, true);
-    wp_enqueue_script('cart-script', get_template_directory_uri() . '/assets/js/cart.js', array('jquery'), null, true);
-    wp_enqueue_script('auth-script', get_template_directory_uri() . '/auth.js', array('jquery'), null, true);
 }
 
 add_action('wp_enqueue_scripts', 'enqueue_theme_styles_and_scripts');
 
-add_action('wp_enqueue_scripts', function () {
-    global $wp_scripts;
-    global $wp_styles;
+function enqueue_theme_scripts()
+{
+    // Enqueue WordPress jQuery
+    wp_enqueue_script('jquery');
+// Enqueue js-cookie library (from CDN)
+    wp_enqueue_script('js-cookie', 'https://cdnjs.cloudflare.com/ajax/libs/js-cookie/3.0.1/js.cookie.min.js', array(), '3.0.1', true);
 
-    // Debug all enqueued scripts
-    foreach ($wp_scripts->queue as $handle) {
-        error_log("SCRIPT LOADED: " . $handle . " -> " . $wp_scripts->registered[$handle]->src);
-    }
+    // Enqueue custom scripts with versioning for cache busting
+    wp_enqueue_script('cart-script', get_template_directory_uri() . '/assets/js/cart.js', array('jquery'), '1.0', true);
+    wp_enqueue_script('auth-script', get_template_directory_uri() . '/assets/js/auth.js', array('jquery'), '1.0', true);  // Ensure jQuery is a dependency
+}
 
-    // Debug all enqueued styles
-    foreach ($wp_styles->queue as $handle) {
-        error_log("STYLE LOADED: " . $handle . " -> " . $wp_styles->registered[$handle]->src);
-    }
-});
+add_action('wp_enqueue_scripts', 'enqueue_theme_scripts');
 
 
 // Регистрация меню
@@ -356,27 +356,6 @@ function ajax_update_cart_quantity()
 }
 
 
-add_action('wp_enqueue_scripts', 'enqueue_cart_scripts');
-add_action('wp_enqueue_scripts', 'enqueue_auth_scripts');
-function enqueue_cart_scripts()
-{
-    wp_enqueue_script('cart-js', get_template_directory_uri() . '/cart.js', ['jquery'], null, true);
-    wp_localize_script('cart-js', 'cartAjax', [
-        'ajax_url' => admin_url('admin-ajax.php'),
-        'nonce' => wp_create_nonce('cart_nonce')
-    ]);
-}
-
-function enqueue_auth_scripts()
-{
-    wp_enqueue_script('auth-js', get_template_directory_uri() . '/auth.js', ['jquery'], null, true);
-    wp_localize_script('auth-js', 'authAjax', [
-        'ajax_url' => admin_url('admin-ajax.php'),
-        'nonce' => wp_create_nonce('auth_nonce')
-    ]);
-}
-
-
 function register_custom_post_type_cart()
 {
     $labels = array(
@@ -440,7 +419,10 @@ function handle_order()
     $customer_name = $data['name'];
     $customer_email = $data['email'];
     $cart = $data['cart']; // Массив товаров
-
+    $alertif = $data['alertif'];
+    $workif = $data['workif'];
+    $datenow = $data['datenow'];;
+    $datetill = $data['datetill'];
 
     // Генерируем уникальный идентификатор заказа
     $id_order = uniqid();
@@ -772,5 +754,27 @@ function register_product_rating_widget()
 }
 
 add_action('widgets_init', 'register_product_rating_widget');
+
+function my_enqueue_scripts() {
+    // Enqueue your script
+    wp_enqueue_script('my-script', get_template_directory_uri() . '/js/auth.js', array('jquery'), null, true);
+    
+    // Localize ajax_url to the script
+    wp_localize_script('my-script', 'ajax_object', array(
+        'ajax_url' => admin_url('admin-ajax.php')
+    ));
+}
+add_action('wp_enqueue_scripts', 'my_enqueue_scripts');
+
+function add_site_url_to_js() {
+    ?>
+    <script type="text/javascript">
+        var siteUrl = "<?php echo esc_url( home_url( '/' ) ); ?>";
+    </script>
+    <?php
+}
+add_action('wp_head', 'add_site_url_to_js');
+
+
 ?>
 

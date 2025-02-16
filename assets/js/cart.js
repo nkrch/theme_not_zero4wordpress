@@ -1,9 +1,3 @@
-//Создайте файл cart.js в вашей теме.
-//Реализуйте функции для добавления товаров в корзину,
-(function ($) {
-  console.log("✅ cart.js is loaded and running");
-})(jQuery);
-
 function submitFunc(product, price, description, image, id) {
   console.log(product);
   const cart = getCart();

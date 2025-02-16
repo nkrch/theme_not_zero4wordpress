@@ -1,0 +1,43 @@
+.pop-up-form {
+  background-color: rgb(255, 255, 255);
+  box-shadow: 0px 0px 9px 9px rgba(201, 83, 84, 0.27);
+
+  #span-switcher {
+    background-color: rgba(150, 27, 29, 0.77);
+    width: 150px;
+    height: 35px;
+    position: absolute; /* Allow it to be positioned freely */
+
+    transition: left 0.3s ease; /* Smooth transition on the 'left' property */
+
+    z-index: 10; /* Ensure it's on top of other elements */
+  }
+
+  .switch-inner {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+
+    button {
+      width: 150px;
+      height: 35px;
+      background-color: #0a246a;
+    }
+  }
+}
+
+@keyframes toenter {
+  0% {
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes toregister {
+  0% {
+  }
+  100% {
+    transform: translateX(50%);
+  }
+}
