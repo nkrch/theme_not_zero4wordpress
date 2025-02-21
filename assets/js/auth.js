@@ -17,16 +17,16 @@ const popUpAuth = `<div class="container">
     
 </div>
 `;
-let span;
+let span = document.getElementById("span-switcher");
 
-const formAuth = `<form class="formAuth">
+const formAuth = `<form class="formAuth">  
 <input name="email" placeholder="email" type="email"/>
 <input name="password" placeholder="password" type="password"/>
 <button class="submit-btn" onclick="enterFunc(event)">Войти</button>
 </form>
 `;
 
-const formRegister = `<form class="formRegister">
+const formRegister = `<form class="formRegister">            
 <input name='name' placeholder='name' type="text"/>
 <input name="email" placeholder="email" type="email"/>
 <input name="password" placeholder="password" type="password"/>
@@ -42,20 +42,16 @@ function startAuth() {
   popUpAuthForm.innerHTML = popUpAuth;
   popUpAuthForm.className = "pop-up-form";
   popUpAuthForm.style.width = "500px";
-  popUpAuthForm.style.height = "430px";
   popUpAuthForm.style.position = "fixed";
   popUpAuthForm.style.top = "50%";
   popUpAuthForm.style.left = "50%";
   popUpAuthForm.style.transform = "translate(-50%, -50%)";
   popUpAuthForm.style.display = "flex";
-  popUpAuthForm.style.justifyContent = "center";
-  popUpAuthForm.style.alignItems = "center";
+
   popUpAuthForm.style.borderRadius = "10px";
   popUpAuthForm.style.zIndex = "1";
   document.body.append(popUpAuthForm);
   document.getElementsByClassName("switcher")[0].innerHTML += formAuth;
-  span = document.getElementById("span-switcher");
-  console.log(span);
   animationsSwitch("enter");
 }
 
@@ -92,8 +88,12 @@ function formSwitcher(optionTo) {
 function animationsSwitch(option) {
   switch (option) {
     case "enter":
-      console.log("enter");
+      console.log("enter-anima");
+      span = document.getElementById("span-switcher");
       // Ensure the span element is not in any animation state
+      span.style.width =
+        document.getElementsByClassName("btn-switcher")[0].clientWidth + "px";
+
       span.style.animation = "none"; // Clear any existing animation
 
       // Force a reflow to ensure the animation is reset
@@ -101,20 +101,18 @@ function animationsSwitch(option) {
 
       // Apply the "toenter" animation
       span.style.animation = "toenter 0.3s ease forwards";
-
+      span.style.animationIterationCount = 1;
       // Add an animationend listener for additional handling if needed
-      span.addEventListener(
-        "animationend",
-        function () {
-          // Optionally handle after the animation ends
-        },
-        { once: true }
-      );
+
       break;
 
     case "regist":
-      console.log("regist");
+      console.log("regist-anima");
+      span = document.getElementById("span-switcher");
+
       // Ensure the span element is not in any animation state
+      span.style.width =
+        document.getElementsByClassName("btn-switcher")[0].clientWidth + "px";
       span.style.animation = "none"; // Clear any existing animation
 
       // Force a reflow to ensure the animation is reset
@@ -122,15 +120,10 @@ function animationsSwitch(option) {
 
       // Apply the "toregister" animation
       span.style.animation = "toregister 0.3s ease forwards";
+      span.style.animationIterationCount = 1;
 
       // Add an animationend listener for additional handling if needed
-      span.addEventListener(
-        "animationend",
-        function () {
-          // Optionally handle after the animation ends
-        },
-        { once: true }
-      );
+
       break;
 
     default:
@@ -193,7 +186,14 @@ function regUser(data, siteUrl) {
     .then((data) => {
       if (data.success) {
         console.log(data);
-        alert("User registered successfully");
+        toastifier(
+          "Регистрация прошла успешно",
+          1000,
+          true,
+          "top",
+          "center",
+          "#0b6e4f",
+        );
       } else {
         console.error("Error:", data.data.message);
       }
@@ -222,12 +222,12 @@ function enterUser(data, siteUrl) {
     .then((data) => {
       if (data.success) {
         console.log(data);
-        alert("User entered successfully");
-
+        toastifier("Успешно", 1000, true, "top", "center", "#0b6e4f");
         //make save
+        setTimeout(() => location.reload(), 600);
       } else {
-        console.error("Error:", data.data.message);
+        toastifier(data.data.message, 1000, true, "top", "center", "#0b6e4f");
       }
     })
-    .catch((error) => console.error("Error:", error));
+    .catch((error) => console.error("Ошибка:", error));
 }

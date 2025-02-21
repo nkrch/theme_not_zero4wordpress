@@ -1,43 +1,43 @@
 <?php
 /* Template Name: Cart */
 get_header(); ?>
-<main class="card-container">
-    <h1>Корзина</h1>
+    <main class="card-container">
+        <h1>Корзина</h1>
 
-    <?php
-    // Получение данных корзины из куки
+        <?php
+        // Получение данных корзины из куки
 
-    
-    $cart_cookie = isset($_COOKIE['cart']) ? json_decode(stripslashes($_COOKIE['cart']), true) : [];
-    if (empty($cart_cookie)) {
-        echo '<p>Корзина пуста :(</p>';
-    } else {
-        echo '<div class="cart-list">';
-        echo '<table class="cart-table">';
-        echo '<thead>';
-        echo '<tr> <th>Наименование</th> <th>Цена</th> <th>Количество</th> <th>Итого</th> </tr>';
-        echo '</thead>';
-        echo '<tbody>';
 
-        $total = 0; // Переменная для хранения итоговой суммы
+        $cart_cookie = isset($_COOKIE['cart']) ? json_decode(stripslashes($_COOKIE['cart']), true) : [];
+        if (empty($cart_cookie)) {
+            echo '<p>Корзина пуста :(</p>';
+        } else {
+            echo '<div class="cart-list">';
+            echo '<table class="cart-table">';
+            echo '<thead>';
+            echo '<tr> <th>Наименование</th> <th>Цена</th> <th>Количество</th> <th>Итого</th> </tr>';
+            echo '</thead>';
+            echo '<tbody>';
 
-        foreach ($cart_cookie as $item) {
-            // Проверяем наличие необходимых данных в элементе корзины
-            $quantity = $item['quantity'];
-            $name = $item['title'];
-            $price = $item['price'];
+            $total = 0; // Переменная для хранения итоговой суммы
 
-            // Расчёт итоговой стоимости для каждого товара
-            $item_total = $price * $quantity;
-            $total += $item_total;
+            foreach ($cart_cookie as $item) {
+                // Проверяем наличие необходимых данных в элементе корзины
+                $quantity = $item['quantity'];
+                $name = $item['title'];
+                $price = $item['price'];
 
-            // Вывод карточки товара
-            echo '<tr class="cart-card">';
-            if (!empty($name)) {
-                echo '<td>' . esc_html($name) . '</td>';
-            }
-            echo '<td>' . esc_html($price) . ' руб.</td>';
-            echo '<td>' . esc_html($quantity) . ' 
+                // Расчёт итоговой стоимости для каждого товара
+                $item_total = $price * $quantity;
+                $total += $item_total;
+
+                // Вывод карточки товара
+                echo '<tr class="cart-card">';
+                if (!empty($name)) {
+                    echo '<td>' . esc_html($name) . '</td>';
+                }
+                echo '<td>' . esc_html($price) . ' руб.</td>';
+                echo '<td>' . esc_html($quantity) . ' 
                 <button class="rem-add-btn" onClick="updateFromCartPage(`' . $name . '`, ' . ($quantity + 1) . ', ``)">+</button>
                 <button class="rem-add-btn" onClick="updateFromCartPage(`' . $name . '`, ' . ($quantity - 1) . ', ``)">-</button>
                 <button class="rem-add-btn" id="delete-btn" onClick="removeFromCart(`' . $name . '`)"><svg fill="#000000" height="14px" width="14px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
@@ -52,23 +52,25 @@ get_header(); ?>
 	</g>
 </g></button>
                 </td>';
-            echo '<td>' . esc_html($item_total) . ' руб.</td>';
-            echo '</tr>';
+                echo '<td>' . esc_html($item_total) . ' руб.</td>';
+                echo '</tr>';
+            }
+
+            // Итоговая строка
+            echo '<tr><td colspan="3" style="text-align: right; font-weight: bold;">Итого:</td><td>' . esc_html($total) . ' руб.</td></tr>';
+
+            echo '</tbody>';
+            echo '</table>';
+            if (is_user_logged_in()) :
+                echo "<a id='order' href=" . site_url('/order') . ">ЗАКАЗАТЬ</a>";
+            else : echo '<button onclick="startAuth()">Чтобы заказать, зарегистрируйтесь или войдите в существующий аккаунт</button>';
+            endif;
+            echo '</div>';
+
+            wp_reset_postdata();
         }
-
-        // Итоговая строка
-        echo '<tr><td colspan="3" style="text-align: right; font-weight: bold;">Итого:</td><td>' . esc_html($total) . ' руб.</td></tr>';
-
-        echo '</tbody>';
-        echo '</table>';
-        echo "<a id='order' href=" . site_url('/order') . ">ЗАКАЗАТЬ</a>";
-        echo '</div>';
-
-        wp_reset_postdata();
-    }
-    ?>
-</main>
-
+        ?>
+    </main>
 
 
 <?php

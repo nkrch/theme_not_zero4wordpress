@@ -35,6 +35,10 @@ function enqueue_theme_scripts()
     // Enqueue custom scripts with versioning for cache busting
     wp_enqueue_script('cart-script', get_template_directory_uri() . '/assets/js/cart.js', array('jquery'), '1.0', true);
     wp_enqueue_script('auth-script', get_template_directory_uri() . '/assets/js/auth.js', array('jquery'), '1.0', true);  // Ensure jQuery is a dependency
+    wp_enqueue_script('toast-script', get_template_directory_uri() . '/assets/js/toastifier.js', array('jquery'), '1.0', true);
+    wp_enqueue_script('toast-script', get_template_directory_uri() . '/assets/js/cab.js', array('jquery'), '1.0', true);
+
+
 }
 
 add_action('wp_enqueue_scripts', 'enqueue_theme_scripts');
@@ -458,8 +462,14 @@ function handle_order()
     update_field('datenow', $datenow, $order_id);
     update_field('datetill', $datetill, $order_id);
 
+
     // Возвращаем успешный ответ
-    wp_send_json_success(['message' => 'Заказ успешно создан!', 'order_id' => $order_id]);
+    wp_send_json_success([
+        'message' => 'Заказ успешно создан!',
+        'order_id' => $order_id,
+        //'external_response' => json_decode(wp_remote_retrieve_body($response), true),
+    ]);
+
     wp_die(); // Завершаем выполнение
 }
 
@@ -755,26 +765,44 @@ function register_product_rating_widget()
 
 add_action('widgets_init', 'register_product_rating_widget');
 
-function my_enqueue_scripts() {
+function my_enqueue_scripts()
+{
     // Enqueue your script
     wp_enqueue_script('my-script', get_template_directory_uri() . '/js/auth.js', array('jquery'), null, true);
-    
+    wp_enqueue_script('toast-script', get_template_directory_uri() . '/js/toastifier.js', array('jquery'), null, true);
+
     // Localize ajax_url to the script
     wp_localize_script('my-script', 'ajax_object', array(
         'ajax_url' => admin_url('admin-ajax.php')
     ));
+    wp_localize_script('toast-script', 'ajax_object', array(
+        'ajax_url' => admin_url('admin-ajax.php')
+    ));
 }
+
 add_action('wp_enqueue_scripts', 'my_enqueue_scripts');
 
-function add_site_url_to_js() {
+function add_site_url_to_js()
+{
     ?>
     <script type="text/javascript">
-        var siteUrl = "<?php echo esc_url( home_url( '/' ) ); ?>";
+        var siteUrl = "<?php echo esc_url(home_url('/')); ?>";
     </script>
     <?php
 }
+
 add_action('wp_head', 'add_site_url_to_js');
 
+//CABINET
 
-?>
+function add_personal_account_menu_item($items, $args)
+{
+    // Проверяем, если пользователь залогинен и меню — главное
+    if (is_user_logged_in() && $args->theme_location == 'primary') {
+        $items .= '<li class="menu-item"><a href="' . esc_url(get_permalink('/cab')) . '">Личный кабинет</a></li>';
+    }
+    return $items;
+}
+
+add_filter('wp_nav_menu_items', 'add_personal_account_menu_item', 10, 2);
 

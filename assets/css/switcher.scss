@@ -1,27 +1,63 @@
 .pop-up-form {
   background-color: rgb(255, 255, 255);
   box-shadow: 0px 0px 9px 9px rgba(201, 83, 84, 0.27);
+  padding: 1vw 1vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: fit-content;
+  min-height: 40vh;
+
+
+  .switcher {
+    gap: 2vh;
+    display: flex;
+    flex-direction: column;
+  }
 
   #span-switcher {
     background-color: rgba(150, 27, 29, 0.77);
-    width: 150px;
-    height: 35px;
+    width: 50%;
+    height: 40px;
+    border-radius: 5px;
     position: absolute; /* Allow it to be positioned freely */
 
     transition: left 0.3s ease; /* Smooth transition on the 'left' property */
 
-    z-index: 10; /* Ensure it's on top of other elements */
+    z-index: 0; /* Ensure it's on top of other elements */
   }
 
   .switch-inner {
-    width: 100%;
+    //width: 100%;
     display: flex;
     justify-content: space-around;
+    align-items: center;
 
     button {
-      width: 150px;
+      width: 50%;
       height: 35px;
-      background-color: #0a246a;
+      z-index: 2;
+      background-color: rgba(10, 36, 106, 0);
+      border: 0cap;
+    }
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 100%;
+
+    input {
+      border: 0cap;
+      border-bottom: 1px solid #171717;
+      width: 20vw;
+      padding: 2.5%;
+    }
+
+    button {
+      width: 20vw;
+      padding: 2.5%;
     }
   }
 }

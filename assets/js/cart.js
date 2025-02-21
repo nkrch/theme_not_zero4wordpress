@@ -58,13 +58,6 @@ function updateCartCount() {
   console.log(count);
 }
 
-//  изменения количества,
-// удаления товаров
-// расчета общей стоимости.
-
-//Используйте cookies для хранения данных о товарах.
-//Добавить количество элементов корзины рядом с корзиной
-
 function removeFromCart(title) {
   let cart = getCart();
   cart = cart.filter((item) => item.title !== title);
@@ -106,12 +99,7 @@ function orderFunc(event, siteUrl) {
   sendAjax(orderData, dbUrl);
 }
 
-//use local domain
-//create local domain
-//in settings of wordpress in generals rewrite rules
-//
-
-function sendAjax(data, url) {
+async function sendAjax(data, url) {
   console.log(data);
   console.log(url);
 
@@ -119,6 +107,7 @@ function sendAjax(data, url) {
   const formData = new FormData();
   formData.append("action", "create_order"); // WordPress ожидает поле "action"
   formData.append("data", JSON.stringify(data)); // Передаем сериализованные данные
+  console.log(formData);
   fetch(url, {
     method: "POST",
     body: formData,
@@ -132,14 +121,46 @@ function sendAjax(data, url) {
     .then((data) => {
       console.log("Response:", JSON.parse(data));
       document.querySelector("form").reset();
+      toastifier(
+        "Ваш заказ в обработке",
+        1000,
+        false,
+        "top",
+        "center",
+        "black",
+      );
       deleteCart();
     })
     .catch((err) => console.error("Error:", err));
+  /*
+            * $customer_name = sanitize_text_field($request->get_param('name'));;
+                  $email = sanitize_email($request->get_param('email'));
+                  $title = sanitize_text_field($request->get_param('title'));
+                  $description = $request->get_param('description') ? wp_filter_post_kses($request->get_param('description')) : '';
+                  $cart = $request->get_param('cart') ? wp_filter_post_kses($request->get_param('cart')) : [];
+                  $status = get_post_meta(get_the_ID(), 'status', true);*/
+  let formData2 = new FormData();
+  formData2.append("name", data.name);
+  formData2.append("email", data.email);
+  formData2.append("cart", JSON.stringify(data.cart));
+  formData2.append("title", "title");
+
+  fetch(window.location.origin + "/wordpress/wp-json/myplugin/v1/orders", {
+    method: "POST",
+    body: formData2,
+  })
+    .then((response) => response.json())
+    .then((res) => {
+      console.log(res);
+    })
+    .catch((error) => {
+      console.log("post-result").textContent = "Error: " + error;
+    });
 }
 
 function deleteCart() {
   Cookies.remove("cart");
-  location.reload();
+  //location.reload();
 }
 
 function ajaxUserCartSave(data, url, option) {

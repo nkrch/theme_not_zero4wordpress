@@ -11,6 +11,17 @@ class Product_Rating_Widget extends WP_Widget
         );
     }
 
+    private function get_star_rating($rating)
+    {
+        $full_stars = floor($rating);
+        $half_star = ($rating - $full_stars) >= 0.5 ? 1 : 0;
+        $empty_stars = 5 - ($full_stars + $half_star);
+
+        return str_repeat('★', $full_stars) .
+            ($half_star ? '☆' : '') .
+            str_repeat('☆', $empty_stars);
+    }
+
     public function widget($args, $instance)
     {
         $products = get_posts(['post_type' => 'product', 'numberposts' => -1]);
@@ -26,68 +37,59 @@ class Product_Rating_Widget extends WP_Widget
         echo $args['before_title'] . 'Рейтинг товаров' . $args['after_title'];
 
         // Get products
-        $query = new WP_Query(array(
+        $query = new WP_Query([
             'post_type' => 'product',
             'posts_per_page' => -1
-        ));
+        ]);
 
-        //pre demo filter
         $presortable = [];
-        if ($query->have_posts()) {
-            $presortable = []; // Initialize array before the loop
 
+        if ($query->have_posts()) {
             while ($query->have_posts()) {
                 $query->the_post();
-                $name = get_the_title(); // Or get_field('name') if it's a custom field
+                $name = get_the_title();
                 $rating = get_post_meta(get_the_ID(), 'rating', true);
                 $link = get_permalink();
 
                 // Set default rating to 0 if empty
-                if (empty($rating)) {
-                    $rating = 0;
-                }
+                $rating = empty($rating) ? 0 : (float)$rating;
 
                 $presortable[] = ['name' => $name, 'rating' => $rating, 'link' => $link];
             }
         }
+        wp_reset_postdata();
 
-// Sort the array by rating in descending order
+        // Sort the array by rating in descending order
         $sortable = $this->array_sort($presortable, 'rating', SORT_DESC);
 
-
         echo '<div class="widget-container">';
-        for ($i = 0; $i < 5; $i++) {
+
+        for ($i = 0; $i < min(5, count($sortable)); $i++) {
             echo '<div class="container-of-rating-item">';
-            echo '<a href="' . $sortable[$i]['link'] . '">' . $sortable[$i]['name'] . '</a> ' . $sortable[$i]['rating'] . '<br>';
+            echo '<a href="' . esc_url($sortable[$i]['link']) . '">' . esc_html($sortable[$i]['name']) . '</a> ';
+            echo '<p class="stars-widget">' . $this->get_star_rating($sortable[$i]['rating']) . '</p>' . '<br>';
             echo '</div>';
         }
-        echo '</div';
 
+        echo '</div>'; // Corrected closing div tag
 
         echo $args['after_widget'];
     }
 
-
-    function array_sort($array, $key, $sort_order = SORT_DESC)
+    private function array_sort($array, $key, $sort_order = SORT_DESC)
     {
         if (!is_array($array) || empty($array)) {
-            return []; // Возвращаем пустой массив, если входные данные неверные
+            return [];
         }
 
         usort($array, function ($a, $b) use ($key, $sort_order) {
             if (!isset($a[$key]) || !isset($b[$key])) {
-                return 0; // Пропускаем элементы без нужного ключа
+                return 0;
             }
 
-            if ($sort_order === SORT_DESC) {
-                return $b[$key] <=> $a[$key]; // Сортировка по убыванию
-            } else {
-                return $a[$key] <=> $b[$key]; // Сортировка по возрастанию
-            }
+            return ($sort_order === SORT_DESC) ? ($b[$key] <=> $a[$key]) : ($a[$key] <=> $b[$key]);
         });
 
         return $array;
     }
-
 }
-

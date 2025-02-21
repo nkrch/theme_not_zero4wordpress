@@ -1,31 +1,41 @@
-
 .widget-area {
   display: block !important;
 }
 
 .widget-container {
-  width: 18vw;
+  width: 22vw;
   display: flex;
   flex-direction: column;
   gap: 5px;
+  margin-top: 10px;
+  margin-right: 3vw;
+
+  .stars-widget {
+    color: rgb(198, 48, 49);
+    margin-top: 0px;
+    font-size: 20px;
+    font-weight: bold;
+  }
 
   .container-of-rating-item {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     justify-content: space-between;
-    flex-wrap: wrap;
-
-
+    flex-wrap: nowrap;
+    align-items: center;
     a {
       margin: 0;
       padding: 0;
-      padding-right: 5px;
+      padding-right: 15px;
+      width: 60%;
+    }
+
+    p {
+      margin-bottom: 5px;
     }
   }
-
 }
 
 .container-full-archive {
   display: flex;
 }
-
